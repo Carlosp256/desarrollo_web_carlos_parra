@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Listado de Miembros — DCC</title>
+  <link rel="stylesheet" href="/css/estilos.css">
+</head>
+<body>
+  <header>
+    <h1>Sistema de Actividades Extracurriculares — DCC</h1>
+    <nav aria-label="Navegación principal">
+      <ul>
+        <li><a href="{{ url_for('index') }}">Inicio</a></li>
+        <li><a href="{{ url_for('registro') }}">Registrar Miembro</a></li>
+        <li><a href="{{ url_for('actividad') }}">Registrar Actividad</a></li>
+        <li><a href="{{ url_for('miembros') }}" class="activo">Listado de Miembros</a></li>
+        <li><a href="{{ url_for('estadisticas') }}">Estadísticas</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <main>
+    <section class="encabezado-seccion">
+      <h2>Listado de Miembros</h2>
+      <p>Consulte, filtre y ordene los miembros registrados. Haga clic en una fila para ver el detalle.</p>
+    </section>
+
+    <section aria-label="Filtros y ordenamiento">
+      <form class="controles-listado" method="get" action="{{ url_for('miembros') }}">
+        <div class="control-campo">
+          <label for="busqueda">Buscar por nombre o correo</label>
+          <input type="search" id="busqueda" name="busqueda"
+                 value="{{ busqueda | e }}" placeholder="Escriba para buscar...">
+        </div>
+
+        <div class="control-campo">
+          <label for="filtro-region">Filtrar por región</label>
+          <select id="filtro-region" name="region_id">
+            <option value="">Todas las regiones</option>
+            {% for r in regiones %}
+            <option value="{{ r.id }}" {% if region_id == r.id|string %}selected{% endif %}>
+              {{ r.nombre | e }}
+            </option>
+            {% endfor %}
+          </select>
+        </div>
+
+        <div class="control-campo">
+          <label for="filtro-actividades">Actividades</label>
+          <select id="filtro-actividades" name="actividades">
+            <option value=""    {% if actividades == '' %}selected{% endif %}>Todos</option>
+            <option value="con" {% if actividades == 'con' %}selected{% endif %}>Con actividades</option>
+            <option value="sin" {% if actividades == 'sin' %}selected{% endif %}>Sin actividades</option>
+          </select>
+        </div>
+
+        <div class="control-campo">
+          <label for="ordenar-por">Ordenar por</label>
+          <select id="ordenar-por" name="orden">
+            <option value="nombre-asc"  {% if orden == 'nombre-asc' %}selected{% endif %}>Nombre A–Z</option>
+            <option value="nombre-desc" {% if orden == 'nombre-desc' %}selected{% endif %}>Nombre Z–A</option>
+            <option value="email-asc"   {% if orden == 'email-asc' %}selected{% endif %}>Correo A–Z</option>
+            <option value="fecha-desc"  {% if orden == 'fecha-desc' %}selected{% endif %}>Más recientes</option>
+          </select>
+        </div>
+
+        <button type="submit" class="boton">Filtrar</button>
+      </form>
+    </section>
+
+    <section aria-label="Tabla de resultados">
+      <div class="tabla-contenedor">
+        <table class="tabla-miembros">
+          <caption class="sr-only">Listado de miembros de la comunidad DCC</caption>
+          <thead>
+            <tr>
+              <th scope="col">Nombre</th>
+              <th scope="col">Correo electrónico</th>
+              <th scope="col">Teléfono</th>
+              <th scope="col">Comuna</th>
+              <th scope="col">Fecha de registro</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% if pag.items %}
+              {% for m in pag.items %}
+              <tr class="fila-miembro"
+                  data-href="{{ url_for('detalle_miembro', mid=m.id) }}?busqueda={{ busqueda | urlencode }}&amp;orden={{ orden | urlencode }}&amp;region_id={{ region_id | urlencode }}&amp;actividades={{ actividades | urlencode }}&amp;pagina={{ pag.page }}">
+                <td>{{ m.nombre | e }}</td>
+                <td>{{ m.email | e }}</td>
+                <td>{{ m.telefono | e }}</td>
+                <td>{{ m.comuna.nombre | e }}</td>
+                <td>{{ m.fecha_registro.strftime('%d/%m/%Y') }}</td>
+              </tr>
+              {% endfor %}
+            {% else %}
+              <tr><td colspan="5" class="sin-resultados">No se encontraron miembros con los filtros aplicados.</td></tr>
+            {% endif %}
+          </tbody>
+        </table>
+      </div>
+
+      <nav class="paginacion" aria-label="Paginación de resultados">
+        <p class="paginacion-info">
+          {% if pag.total > 0 %}
+            Mostrando {{ (pag.page - 1) * pag.per_page + 1 }}–{{ [pag.page * pag.per_page, pag.total] | min }} de {{ pag.total }} miembro(s)
+          {% else %}
+            Sin resultados
+          {% endif %}
+        </p>
+        <div class="paginacion-botones">
+          {% if pag.has_prev %}
+            <a href="{{ url_for('miembros') }}?busqueda={{ busqueda | urlencode }}&orden={{ orden | urlencode }}&region_id={{ region_id | urlencode }}&actividades={{ actividades | urlencode }}&pagina={{ pag.prev_num }}" class="boton">← Anterior</a>
+          {% endif %}
+          {% for p in pag.iter_pages(left_edge=1, right_edge=1, left_current=2, right_current=2) %}
+            {% if p %}
+              <a href="{{ url_for('miembros') }}?busqueda={{ busqueda | urlencode }}&orden={{ orden | urlencode }}&region_id={{ region_id | urlencode }}&actividades={{ actividades | urlencode }}&pagina={{ p }}"
+                 class="boton {% if p == pag.page %}pagina-activa{% endif %}">{{ p }}</a>
+            {% else %}
+              <span>…</span>
+            {% endif %}
+          {% endfor %}
+          {% if pag.has_next %}
+            <a href="{{ url_for('miembros') }}?busqueda={{ busqueda | urlencode }}&orden={{ orden | urlencode }}&region_id={{ region_id | urlencode }}&actividades={{ actividades | urlencode }}&pagina={{ pag.next_num }}" class="boton">Siguiente →</a>
+          {% endif %}
+        </div>
+      </nav>
+    </section>
+
+    {% if sel %}
+    <section class="detalle-miembro" aria-label="Detalle del miembro seleccionado">
+      <div class="encabezado-seccion">
+        <h2>Detalle: {{ sel.nombre | e }}</h2>
+      </div>
+
+      <div class="contenedor-formulario">
+        <dl class="datos-miembro">
+          <dt>Correo electrónico</dt>
+          <dd>{{ sel.email | e }}</dd>
+          <dt>Teléfono</dt>
+          <dd>{{ sel.telefono | e }}</dd>
+          <dt>Comuna</dt>
+          <dd>{{ sel.comuna.nombre | e }}</dd>
+          <dt>Región</dt>
+          <dd>{{ sel.comuna.region.nombre | e }}</dd>
+          <dt>Fecha de registro</dt>
+          <dd>{{ sel.fecha_registro.strftime('%d/%m/%Y %H:%M') }}</dd>
+        </dl>
+
+        {% if sel.actividades %}
+        <h3>Actividades registradas</h3>
+        {% set tipo_label = {'arte': 'Arte', 'deporte': 'Deporte', 'tecnología': 'Tecnología', 'social': 'Social', 'recreación': 'Recreación', 'otra': 'Otra'} %}
+        {% for act in sel.actividades %}
+        <article class="tarjeta">
+          <h4>{{ act.nombre | e }}</h4>
+          <p><strong>Tipo:</strong> {{ tipo_label.get(act.tipo, act.tipo) }}</p>
+          <p><strong>Día:</strong> {{ act.dia | capitalize }}</p>
+          <p><strong>Hora de inicio:</strong> {{ act.hora_inicio }}</p>
+          <p><strong>Duración:</strong> {{ act.duracion }}</p>
+          {% if act.descripcion %}
+          <p>{{ act.descripcion | e }}</p>
+          {% endif %}
+
+          {% if act.fotos %}
+          <p><strong>Archivos:</strong></p>
+          <ul>
+            {% for foto in act.fotos %}
+            <li>
+              <a href="/uploads/{{ foto.ruta_archivo | e }}" target="_blank" rel="noopener">
+                {{ foto.nombre_archivo | e }}
+              </a>
+            </li>
+            {% endfor %}
+          </ul>
+          {% endif %}
+        </article>
+        {% endfor %}
+        {% else %}
+        <p>Este miembro no tiene actividades registradas.</p>
+        {% endif %}
+      </div>
+    </section>
+    {% endif %}
+
+  </main>
+
+  <footer>
+    <p>CC5002 — Departamento de Ciencias de la Computación &copy; 2025</p>
+  </footer>
+
+  <script>
+    document.querySelectorAll('.fila-miembro').forEach(function (tr) {
+      tr.addEventListener('click', function () {
+        window.location = this.dataset.href;
+      });
+    });
+  </script>
+</body>
+</html>

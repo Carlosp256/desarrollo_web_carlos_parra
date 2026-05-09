@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Estadísticas — DCC</title>
+  <link rel="stylesheet" href="/css/estilos.css">
+</head>
+<body>
+  <header>
+    <h1>Sistema de Actividades Extracurriculares — DCC</h1>
+    <nav aria-label="Navegación principal">
+      <ul>
+        <li><a href="{{ url_for('index') }}">Inicio</a></li>
+        <li><a href="{{ url_for('registro') }}">Registrar Miembro</a></li>
+        <li><a href="{{ url_for('actividad') }}">Registrar Actividad</a></li>
+        <li><a href="{{ url_for('miembros') }}">Listado de Miembros</a></li>
+        <li><a href="{{ url_for('estadisticas') }}" class="activo">Estadísticas</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <main>
+    <section class="encabezado-seccion">
+      <h2>Indicadores y Métricas</h2>
+      <p>Estadísticas generales sobre los miembros registrados y las actividades que realizan.</p>
+    </section>
+
+    <section aria-label="Métricas generales">
+      <div class="tarjetas-metricas">
+        <article class="tarjeta-metrica">
+          <h2 class="valor">18</h2>
+          <span class="etiqueta">Total de miembros</span>
+        </article>
+        <article class="tarjeta-metrica">
+          <h2 class="valor">7</h2>
+          <span class="etiqueta">Estudiantes Pregrado</span>
+        </article>
+        <article class="tarjeta-metrica">
+          <h2 class="valor">4</h2>
+          <span class="etiqueta">Estudiantes Postgrado</span>
+        </article>
+        <article class="tarjeta-metrica">
+          <h2 class="valor">3</h2>
+          <span class="etiqueta">Funcionarios/as</span>
+        </article>
+        <article class="tarjeta-metrica">
+          <h2 class="valor">4</h2>
+          <span class="etiqueta">Académicos/as</span>
+        </article>
+        <article class="tarjeta-metrica">
+          <h2 class="valor">40</h2>
+          <span class="etiqueta">Total de actividades</span>
+        </article>
+      </div>
+    </section>
+
+    <section aria-label="Gráficos estadísticos">
+      <div class="graficos-contenedor">
+
+        <article class="grafico-tarjeta">
+          <h3>Miembros por tipo</h3>
+          <figure>
+            <canvas id="grafico-tipos" width="380" height="260"
+                    aria-label="Gráfico de barras: miembros por tipo">
+              <p>Distribución de miembros: Pregrado 7, Postgrado 4, Funcionarios 3, Académicos 4.</p>
+            </canvas>
+            <figcaption>Distribución de los 18 miembros según su tipo en la comunidad DCC.</figcaption>
+          </figure>
+        </article>
+
+        <article class="grafico-tarjeta">
+          <h3>Actividades por categoría</h3>
+          <figure>
+            <canvas id="grafico-categorias" width="380" height="260"
+                    aria-label="Gráfico de barras: actividades por categoría">
+              <p>Distribución de actividades: Artísticas 8, Deportivas 12, Tecnológicas 6, Sociales 5, Recreativas 9.</p>
+            </canvas>
+            <figcaption>Distribución de las 40 actividades registradas según categoría.</figcaption>
+          </figure>
+        </article>
+
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <p>CC5002 — Departamento de Ciencias de la Computación &copy; 2025</p>
+  </footer>
+
+  <script src="/js/indicadores.js"></script>
+</body>
+</html>

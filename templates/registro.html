@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Registrar Miembro — DCC</title>
+  <link rel="stylesheet" href="/css/estilos.css">
+</head>
+<body>
+  <header>
+    <h1>Sistema de Actividades Extracurriculares — DCC</h1>
+    <nav aria-label="Navegación principal">
+      <ul>
+        <li><a href="{{ url_for('index') }}">Inicio</a></li>
+        <li><a href="{{ url_for('registro') }}" class="activo">Registrar Miembro</a></li>
+        <li><a href="{{ url_for('actividad') }}">Registrar Actividad</a></li>
+        <li><a href="{{ url_for('miembros') }}">Listado de Miembros</a></li>
+        <li><a href="{{ url_for('estadisticas') }}">Estadísticas</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <main>
+    <div class="contenedor-formulario">
+      <h2>Registro de Miembro</h2>
+      <p class="subtitulo-form">Complete los datos del nuevo integrante de la comunidad DCC.</p>
+      <p class="leyenda-obligatorio">
+        Los campos marcados con <span class="obligatorio">*</span> son obligatorios.
+      </p>
+
+      {% if errores %}
+      <p class="mensaje-formulario error-general" role="alert">
+        Por favor, corrija los errores indicados antes de continuar.
+      </p>
+      {% endif %}
+
+      <p id="mensaje-registro" class="mensaje-formulario"></p>
+      <form id="form-registro" action="{{ url_for('registro') }}" method="post" novalidate>
+
+        <fieldset>
+          <legend>Datos personales y de contacto</legend>
+
+          <div class="campo-grupo">
+            <label for="nombre">Nombre completo <span class="obligatorio">*</span></label>
+            <input type="text" id="nombre" name="nombre" autocomplete="name"
+                   placeholder="Ingrese su nombre completo"
+                   value="{{ datos.get('nombre', '') | e }}"
+                   class="{% if errores.get('nombre') %}campo-invalido{% endif %}">
+            <p class="error-mensaje{% if errores.get('nombre') %} visible{% endif %}"
+               id="error-nombre" aria-live="polite">
+              {{ errores.get('nombre', '') | e }}
+            </p>
+          </div>
+
+          <div class="campo-grupo">
+            <label for="email">Correo electrónico <span class="obligatorio">*</span></label>
+            <input type="email" id="email" name="email" autocomplete="email"
+                   placeholder="correo@ejemplo.cl"
+                   value="{{ datos.get('email', '') | e }}"
+                   class="{% if errores.get('email') %}campo-invalido{% endif %}">
+            <p class="error-mensaje{% if errores.get('email') %} visible{% endif %}"
+               id="error-email" aria-live="polite">
+              {{ errores.get('email', '') | e }}
+            </p>
+          </div>
+
+          <div class="campo-grupo">
+            <label for="telefono">Teléfono <span class="obligatorio">*</span></label>
+            <input type="tel" id="telefono" name="telefono" autocomplete="tel"
+                   placeholder="+56 9 1234 5678"
+                   value="{{ datos.get('telefono', '') | e }}"
+                   class="{% if errores.get('telefono') %}campo-invalido{% endif %}">
+            <p class="error-mensaje{% if errores.get('telefono') %} visible{% endif %}"
+               id="error-telefono" aria-live="polite">
+              {{ errores.get('telefono', '') | e }}
+            </p>
+          </div>
+        </fieldset>
+
+        <fieldset>
+          <legend>Ubicación</legend>
+
+          <div class="dos-columnas">
+            <div class="campo-grupo">
+              <label for="region_id">Región <span class="obligatorio">*</span></label>
+              <select id="region_id" name="region_id">
+                <option value="">— Seleccione una región —</option>
+                {% for r in regiones %}
+                <option value="{{ r.id }}"
+                  {% if datos.get('region_id')|string == r.id|string %}selected{% endif %}>
+                  {{ r.nombre | e }}
+                </option>
+                {% endfor %}
+              </select>
+              <p class="error-mensaje" id="error-region_id" aria-live="polite"></p>
+            </div>
+
+            <div class="campo-grupo">
+              <label for="comuna_id">Comuna <span class="obligatorio">*</span></label>
+              <select id="comuna_id" name="comuna_id"
+                      class="{% if errores.get('comuna_id') %}campo-invalido{% endif %}">
+                <option value="">— Seleccione primero una región —</option>
+                {% for c in comunas %}
+                <option value="{{ c.id }}" data-region="{{ c.region_id }}"
+                  {% if datos.get('comuna_id')|string == c.id|string %}selected{% endif %}>
+                  {{ c.nombre | e }}
+                </option>
+                {% endfor %}
+              </select>
+              <p class="error-mensaje{% if errores.get('comuna_id') %} visible{% endif %}"
+                 id="error-comuna_id" aria-live="polite">
+                {{ errores.get('comuna_id', '') | e }}
+              </p>
+            </div>
+          </div>
+        </fieldset>
+
+        <button type="submit">Registrar miembro</button>
+
+      </form>
+    </div>
+  </main>
+
+  <footer>
+    <p>CC5002 — Departamento de Ciencias de la Computación &copy; 2025</p>
+  </footer>
+
+  <script src="/js/validaciones.js"></script>
+  <script src="/js/registro.js"></script>
+</body>
+</html>

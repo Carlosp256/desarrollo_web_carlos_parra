@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Registrar Actividad — DCC</title>
+  <link rel="stylesheet" href="/css/estilos.css">
+</head>
+<body>
+  <header>
+    <h1>Sistema de Actividades Extracurriculares — DCC</h1>
+    <nav aria-label="Navegación principal">
+      <ul>
+        <li><a href="{{ url_for('index') }}">Inicio</a></li>
+        <li><a href="{{ url_for('registro') }}">Registrar Miembro</a></li>
+        <li><a href="{{ url_for('actividad') }}" class="activo">Registrar Actividad</a></li>
+        <li><a href="{{ url_for('miembros') }}">Listado de Miembros</a></li>
+        <li><a href="{{ url_for('estadisticas') }}">Estadísticas</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <main>
+    <div class="contenedor-formulario">
+      <h2>Registro de Actividad</h2>
+      <p class="subtitulo-form">Informe una actividad extracurricular que realiza habitualmente.</p>
+      <p class="leyenda-obligatorio">
+        Los campos marcados con <span class="obligatorio">*</span> son obligatorios.
+      </p>
+
+      {% if errores %}
+      <p class="mensaje-formulario error-general" role="alert">
+        Por favor, corrija los errores indicados antes de continuar.
+      </p>
+      {% endif %}
+
+      <p id="mensaje-actividad" class="mensaje-formulario"></p>
+      <form id="form-actividad" action="{{ url_for('actividad') }}" method="post"
+            enctype="multipart/form-data" novalidate>
+
+        <fieldset>
+          <legend>Identificación del miembro</legend>
+          <div class="campo-grupo">
+            <label for="miembro-email">
+              Correo electrónico registrado <span class="obligatorio">*</span>
+            </label>
+            <input type="email" id="miembro-email" name="miembro-email"
+                   placeholder="correo@ejemplo.cl"
+                   value="{{ datos.get('miembro-email', '') | e }}"
+                   class="{% if errores.get('miembro-email') %}campo-invalido{% endif %}">
+            <p class="error-mensaje{% if errores.get('miembro-email') %} visible{% endif %}"
+               id="error-miembro-email" aria-live="polite">
+              {{ errores.get('miembro-email', '') | e }}
+            </p>
+          </div>
+        </fieldset>
+
+        <fieldset>
+          <legend>Datos de la actividad</legend>
+
+          <div class="campo-grupo">
+            <label for="nombre-actividad">Nombre de la actividad <span class="obligatorio">*</span></label>
+            <input type="text" id="nombre-actividad" name="nombre-actividad"
+                   placeholder="Ejemplo: Danza folclórica, Fútbol amateur"
+                   maxlength="45"
+                   value="{{ datos.get('nombre-actividad', '') | e }}"
+                   class="{% if errores.get('nombre-actividad') %}campo-invalido{% endif %}">
+            <p class="error-mensaje{% if errores.get('nombre-actividad') %} visible{% endif %}"
+               id="error-nombre-actividad" aria-live="polite">
+              {{ errores.get('nombre-actividad', '') | e }}
+            </p>
+          </div>
+
+          <div class="campo-grupo">
+            <label for="tipo">Tipo de actividad <span class="obligatorio">*</span></label>
+            <select id="tipo" name="tipo"
+                    class="{% if errores.get('tipo') %}campo-invalido{% endif %}">
+              <option value="">— Seleccione un tipo —</option>
+              <option value="arte"       {% if datos.get('tipo') == 'arte' %}selected{% endif %}>Arte</option>
+              <option value="deporte"    {% if datos.get('tipo') == 'deporte' %}selected{% endif %}>Deporte</option>
+              <option value="tecnología" {% if datos.get('tipo') == 'tecnología' %}selected{% endif %}>Tecnología</option>
+              <option value="social"     {% if datos.get('tipo') == 'social' %}selected{% endif %}>Social</option>
+              <option value="recreación" {% if datos.get('tipo') == 'recreación' %}selected{% endif %}>Recreación</option>
+              <option value="otra"       {% if datos.get('tipo') == 'otra' %}selected{% endif %}>Otra</option>
+            </select>
+            <p class="error-mensaje{% if errores.get('tipo') %} visible{% endif %}"
+               id="error-tipo" aria-live="polite">
+              {{ errores.get('tipo', '') | e }}
+            </p>
+          </div>
+
+          <div class="campo-grupo">
+            <label for="descripcion">Descripción</label>
+            <textarea id="descripcion" name="descripcion"
+                      placeholder="Describa brevemente en qué consiste la actividad...">{{ datos.get('descripcion', '') | e }}</textarea>
+          </div>
+        </fieldset>
+
+        <fieldset>
+          <legend>Horario <span class="obligatorio">*</span></legend>
+
+          <div class="dos-columnas">
+            <div class="campo-grupo">
+              <label for="dia">Día <span class="obligatorio">*</span></label>
+              <select id="dia" name="dia"
+                      class="{% if errores.get('dia') %}campo-invalido{% endif %}">
+                <option value="">— Seleccione un día —</option>
+                <option value="lunes"     {% if datos.get('dia') == 'lunes' %}selected{% endif %}>Lunes</option>
+                <option value="martes"    {% if datos.get('dia') == 'martes' %}selected{% endif %}>Martes</option>
+                <option value="miércoles" {% if datos.get('dia') == 'miércoles' %}selected{% endif %}>Miércoles</option>
+                <option value="jueves"    {% if datos.get('dia') == 'jueves' %}selected{% endif %}>Jueves</option>
+                <option value="viernes"   {% if datos.get('dia') == 'viernes' %}selected{% endif %}>Viernes</option>
+                <option value="sábado"    {% if datos.get('dia') == 'sábado' %}selected{% endif %}>Sábado</option>
+                <option value="domingo"   {% if datos.get('dia') == 'domingo' %}selected{% endif %}>Domingo</option>
+              </select>
+              <p class="error-mensaje{% if errores.get('dia') %} visible{% endif %}"
+                 id="error-dia" aria-live="polite">
+                {{ errores.get('dia', '') | e }}
+              </p>
+            </div>
+
+            <div class="campo-grupo">
+              <label for="hora-inicio">Hora de inicio <span class="obligatorio">*</span></label>
+              <input type="time" id="hora-inicio" name="hora-inicio"
+                     value="{{ datos.get('hora-inicio', '') | e }}"
+                     class="{% if errores.get('hora-inicio') %}campo-invalido{% endif %}">
+              <p class="error-mensaje{% if errores.get('hora-inicio') %} visible{% endif %}"
+                 id="error-hora-inicio" aria-live="polite">
+                {{ errores.get('hora-inicio', '') | e }}
+              </p>
+            </div>
+          </div>
+
+          <div class="campo-grupo">
+            <label for="duracion">Duración (HH:MM) <span class="obligatorio">*</span></label>
+            <input type="time" id="duracion" name="duracion"
+                   value="{{ datos.get('duracion', '') | e }}"
+                   class="{% if errores.get('duracion') %}campo-invalido{% endif %}">
+            <p class="error-mensaje{% if errores.get('duracion') %} visible{% endif %}"
+               id="error-duracion" aria-live="polite">
+              {{ errores.get('duracion', '') | e }}
+            </p>
+          </div>
+        </fieldset>
+
+        <fieldset>
+          <legend>Archivos multimedia <span class="obligatorio">*</span></legend>
+          <p class="subtitulo-form">Adjunte al menos una foto o video de la actividad.</p>
+
+          <div class="zona-archivo">
+            <p>Seleccione imágenes (JPG, PNG, GIF, WEBP) o videos (MP4, WEBM, OGG)</p>
+            <input type="file" id="archivos" name="archivos" accept="image/*,video/*" multiple>
+            <ul class="lista-archivos" id="lista-archivos" aria-live="polite"></ul>
+          </div>
+          <p class="error-mensaje{% if errores.get('archivos') %} visible{% endif %}"
+             id="error-archivos" aria-live="polite">
+            {{ errores.get('archivos', '') | e }}
+          </p>
+        </fieldset>
+
+        <button type="submit">Registrar actividad</button>
+
+      </form>
+    </div>
+  </main>
+
+  <footer>
+    <p>CC5002 — Departamento de Ciencias de la Computación &copy; 2025</p>
+  </footer>
+
+  <script src="/js/validaciones.js"></script>
+  <script src="/js/actividad.js"></script>
+</body>
+</html>

@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Área de Calidad de Vida — DCC</title>
+  <link rel="stylesheet" href="/css/estilos.css">
+</head>
+<body>
+  <header>
+    <h1>Sistema de Actividades Extracurriculares — DCC</h1>
+    <nav aria-label="Navegación principal">
+      <ul>
+        <li><a href="{{ url_for('index') }}" class="activo">Inicio</a></li>
+        <li><a href="{{ url_for('registro') }}">Registrar Miembro</a></li>
+        <li><a href="{{ url_for('actividad') }}">Registrar Actividad</a></li>
+        <li><a href="{{ url_for('miembros') }}">Listado de Miembros</a></li>
+        <li><a href="{{ url_for('estadisticas') }}">Estadísticas</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <main>
+    {% with msgs = get_flashed_messages(with_categories=True) %}
+      {% for cat, msg in msgs %}
+        <p class="mensaje-formulario {{ cat }}" role="alert">{{ msg }}</p>
+      {% endfor %}
+    {% endwith %}
+
+    <section class="bienvenida">
+      <h2>Bienvenido al Sistema de Gestión de Actividades</h2>
+      <p>
+        El Área de Calidad de Vida del Departamento de Ciencias de la Computación ha desarrollado
+        esta plataforma para conocer y compartir las actividades extracurriculares que realizan
+        los estudiantes, funcionarios y académicos del DCC.
+      </p>
+    </section>
+
+    {% if ultimos %}
+    <section aria-label="Últimos miembros registrados">
+      <div class="encabezado-seccion">
+        <h2>Últimos miembros registrados</h2>
+        <p>Los 5 miembros más recientemente agregados al sistema.</p>
+      </div>
+      <div class="tabla-contenedor">
+        <table class="tabla-miembros">
+          <thead>
+            <tr>
+              <th scope="col">Nombre</th>
+              <th scope="col">Correo electrónico</th>
+              <th scope="col">Teléfono</th>
+              <th scope="col">Fecha de registro</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for m in ultimos %}
+            <tr>
+              <td>{{ m.nombre | e }}</td>
+              <td>{{ m.email | e }}</td>
+              <td>{{ m.telefono | e }}</td>
+              <td>{{ m.fecha_registro.strftime('%d/%m/%Y %H:%M') }}</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </section>
+    {% endif %}
+
+    <section aria-label="Accesos rápidos al sistema">
+      <div class="tarjetas-nav">
+        <article class="tarjeta">
+          <h3>Registrar Miembro</h3>
+          <p>Agrega un nuevo miembro de la comunidad DCC al sistema.</p>
+          <a href="{{ url_for('registro') }}" class="boton">Ir a registro</a>
+        </article>
+        <article class="tarjeta">
+          <h3>Registrar Actividad</h3>
+          <p>Informa una actividad extracurricular con horario y archivos multimedia.</p>
+          <a href="{{ url_for('actividad') }}" class="boton">Registrar actividad</a>
+        </article>
+        <article class="tarjeta">
+          <h3>Listado de Miembros</h3>
+          <p>Consulta, filtra y ordena los miembros registrados en el sistema.</p>
+          <a href="{{ url_for('miembros') }}" class="boton">Ver listado</a>
+        </article>
+        <article class="tarjeta">
+          <h3>Estadísticas</h3>
+          <p>Visualiza estadísticas y gráficos sobre miembros y actividades.</p>
+          <a href="{{ url_for('estadisticas') }}" class="boton">Ver estadísticas</a>
+        </article>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <p>CC5002 — Departamento de Ciencias de la Computación &copy; 2025</p>
+  </footer>
+</body>
+</html>
